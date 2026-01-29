@@ -1,0 +1,9 @@
+// SSH Brute Force Detection
+// Detects multiple failed SSH authentication attempts
+// within a 5-minute time window
+
+Syslog
+| where ProcessName == "sshd"
+| where SyslogMessage has_any ("Failed password", "Invalid user")
+| summarize FailedAttempts = count() by Computer, bin(TimeGenerated, 5m)
+| where FailedAttempts >= 5
